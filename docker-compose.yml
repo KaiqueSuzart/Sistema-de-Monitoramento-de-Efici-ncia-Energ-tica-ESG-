@@ -28,7 +28,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=system
       - SPRING_DATASOURCE_PASSWORD=oracle
       - SPRING_PROFILES_ACTIVE=prod
-      - JAVA_TOOL_OPTIONS=${JAVA_TOOL_OPTIONS}
+      - JAVA_TOOL_OPTIONS=-Xmx512m -Xms256m
     depends_on:
       oracle-db:
         condition: service_healthy

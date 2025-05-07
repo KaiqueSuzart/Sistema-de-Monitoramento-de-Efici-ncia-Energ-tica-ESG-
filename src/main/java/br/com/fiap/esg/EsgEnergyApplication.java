@@ -11,22 +11,10 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 
 @SpringBootApplication
-@EnableWebSecurity
 public class EsgEnergyApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(EsgEnergyApplication.class, args);
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/actuator/**", "/swagger-ui/**", "/api-docs/**").permitAll()
-                .anyRequest().authenticated()
-            );
-        return http.build();
     }
 
     @Bean
