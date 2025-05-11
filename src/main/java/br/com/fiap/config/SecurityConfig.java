@@ -42,7 +42,11 @@ public class SecurityConfig {
                 ).permitAll()
                 .anyRequest().authenticated()
             )
-            .httpBasic(Customizer.withDefaults());
+            .httpBasic(Customizer.withDefaults())
+            .formLogin(form -> form
+                .defaultSuccessUrl("/home", true)
+                .permitAll()
+            );
         return http.build();
     }
 }

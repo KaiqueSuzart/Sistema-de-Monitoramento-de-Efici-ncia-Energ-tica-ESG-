@@ -266,7 +266,7 @@ export MAVEN_PROJECTBASEDIR=${MAVEN_BASEDIR:-"$BASE_DIR"}
 if [ "$MVNW_VERBOSE" = true ]; then
   echo $MAVEN_PROJECTBASEDIR
 fi
-MAVEN_OPTS="$MAVEN_OPTS -Xmx512m -XX:MaxPermSize=256m"
+MAVEN_OPTS="$MAVEN_OPTS -Xmx512m"
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then

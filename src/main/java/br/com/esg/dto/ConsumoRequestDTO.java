@@ -16,13 +16,4 @@ public class ConsumoRequestDTO {
     
     @NotNull(message = "O ID do sensor é obrigatório")
     private Long sensorId;
-}
-
-@Data
-public class ConsumoResponseDTO {
-    private Long id;
-    private Double valor;
-    private LocalDateTime dataHora;
-    private Long sensorId;
-    private String sensorNome;
 } 
