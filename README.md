@@ -1,103 +1,41 @@
-# Sistema de Monitoramento de Eficiência Energética (ESG)
+# Sistema de Monitoramento de Eficiência Energética ESG
 
-Este projeto é um sistema de monitoramento de eficiência energética desenvolvido com Spring Boot, utilizando Oracle como banco de dados. O sistema permite o gerenciamento de sensores, monitoramento de consumo energético e geração de alertas.
+## Sobre o Projeto
 
-## Requisitos
+Este sistema foi desenvolvido para monitorar sensores, consumos e alertas de eficiência energética, com interface web moderna e responsiva.
 
-- Java 17
-- Docker
-- Docker Compose
+## Banco de Dados
 
-## Tecnologias Utilizadas
+- **Banco utilizado:** H2 (em memória)
+- **Motivo:** Não foi possível utilizar o Oracle devido a problemas de configuração/conexão. O H2 foi adotado para facilitar o desenvolvimento e testes.
+- **Acesso ao console H2:**
+  - URL: [http://localhost:8082/h2-console](http://localhost:8082/h2-console)
+  - JDBC URL: `jdbc:h2:mem:devdb`
+  - Usuário: `sa` (sem senha)
 
-- Spring Boot 3.1.5
-- Spring Security
-- Spring Data JPA
-- Oracle Database 19c
-- Flyway para migrations
-- SpringDoc OpenAPI (Swagger)
-- Spring Actuator
+## Funcionalidades Implementadas
 
-## Setup do Projeto
+- Cadastro, edição, visualização e remoção de sensores
+- Cadastro, edição, visualização e remoção de consumos
+- Cadastro, visualização e remoção de alertas
+- Acionamento/desligamento de sensores (status ATIVO/INATIVO)
+- Relatórios com filtros e gráficos
+- Login com autenticação
+- Interface moderna com Bootstrap e DataTables
+- Modal de detalhes e edição para entidades
+- Integração completa com backend Spring Boot
 
-### Configuração do Oracle
+## Como rodar o projeto
 
-O projeto utiliza Oracle Database 19c através do Docker. As credenciais padrão são:
+1. Clone o repositório
+2. Execute `mvn spring-boot:run`
+3. Acesse [http://localhost:8082](http://localhost:8082) no navegador
 
-- Sistema:
-  - Usuário: system
-  - Senha: oracle
+## Observações
 
-- Aplicação:
-  - Usuário: esg_user
-  - Senha: esg_password
-  - SID: ORCLPDB1
+- O sistema está pronto para ser adaptado para outros bancos relacionais (basta ajustar o `application.properties`).
+- Caso queira usar Oracle, será necessário revisar a configuração do driver e permissões.
 
-### Build e Execução
+---
 
-1. Clone o repositório:
-   ```bash
-   git clone <repository-url>
-   cd esg-energy
-   ```
-
-2. Build do projeto:
-   ```bash
-   ./mvnw clean package -DskipTests
-   ```
-
-3. Inicie os containers com Docker Compose:
-   ```bash
-   docker-compose up --build
-   ```
-
-   > Nota: Na primeira execução, o Oracle Database pode levar alguns minutos para inicializar completamente.
-
-## Verificação da Aplicação
-
-### Endpoints de Monitoramento
-
-- Health Check: http://localhost:8080/actuator/health
-- Métricas: http://localhost:8080/actuator/metrics
-- Informações: http://localhost:8080/actuator/info
-
-### Documentação da API
-
-- Swagger UI: http://localhost:8080/swagger-ui.html
-- OpenAPI Docs: http://localhost:8080/api-docs
-
-## Estrutura do Banco de Dados
-
-### Tabelas Principais
-
-1. **Sensor**
-   - Armazena informações dos sensores de energia
-   - Campos: id, nome, localização, tipo, status, data de instalação
-
-2. **Consumo**
-   - Registra medições de consumo energético
-   - Campos: id, sensor_id, data_medição, consumo_kwh, pico_demanda
-
-3. **Alerta**
-   - Gerencia alertas de consumo anormal ou problemas
-   - Campos: id, sensor_id, tipo_alerta, descrição, severidade
-
-## Desenvolvimento
-
-### Migrations
-
-As migrations do banco são gerenciadas pelo Flyway e estão localizadas em:
-```
-src/main/resources/db/migration/
-```
-
-### Configurações
-
-As configurações da aplicação podem ser ajustadas em:
-```
-src/main/resources/application.yml
-```
-
-## Suporte
-
-Para questões e suporte, por favor abra uma issue no repositório do projeto.
+Se precisar de mais informações ou encontrar algum problema, abra uma issue ou entre em contato com o time de desenvolvimento.
