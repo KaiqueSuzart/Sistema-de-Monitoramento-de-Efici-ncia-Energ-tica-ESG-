@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Monitoramento - Alertas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+        .severidade-alta { background-color: #ffebee !important; }
+        .severidade-media { background-color: #fff3e0 !important; }
+        .severidade-baixa { background-color: #e8f5e9 !important; }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-bell me-2"></i>Sistema de Monitoramento
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/home}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/logout}">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-bell text-danger me-2"></i>Lista de Alertas
+                    </h4>
+                    <div class="d-flex gap-2">
+                        <form th:action="@{/alertas}" method="get" class="d-flex gap-2">
+                            <select name="sensorId" class="form-select">
+                                <option value="">Todos os Sensores</option>
+                                <option th:each="sensor : ${sensores}" 
+                                        th:value="${sensor.id}" 
+                                        th:text="${sensor.nome}" 
+                                        th:selected="${sensor.id} == ${sensorId}">
+                                </option>
+                            </select>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter me-1"></i>Filtrar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="tabelaAlertas" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Tipo de Alerta</th>
+                                <th>Severidade</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="alerta : ${alertas}" 
+                                th:class="${alerta.nivelSeveridade == 'ALTA' ? 'severidade-alta' : 
+                                          (alerta.nivelSeveridade == 'MEDIA' ? 'severidade-media' : 'severidade-baixa')}">
+                                <td>
+                                    <i th:class="${alerta.tipoAlerta == 'CONSUMO_ELEVADO' ? 'fas fa-bolt text-warning' : 
+                                                (alerta.tipoAlerta == 'TEMPERATURA_ELEVADA' ? 'fas fa-thermometer-full text-danger' : 
+                                                'fas fa-exclamation-triangle text-info')}" 
+                                       class="me-2"></i>
+                                    <span th:text="${alerta.tipoAlerta}"></span>
+                                </td>
+                                <td>
+                                    <span th:class="${alerta.nivelSeveridade == 'ALTA' ? 'badge bg-danger' : 
+                                                    (alerta.nivelSeveridade == 'MEDIA' ? 'badge bg-warning' : 'badge bg-success')}"
+                                          th:text="${alerta.nivelSeveridade}">
+                                    </span>
+                                </td>
+                                <td th:text="${#temporals.format(alerta.dataAlerta, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                    <span th:class="${alerta.resolvido ? 'badge bg-success' : 'badge bg-danger'}"
+                                          th:text="${alerta.resolvido ? 'Resolvido' : 'Pendente'}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-info" th:onclick="'visualizarDetalhes(' + ${alerta.id} + ')'">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button th:if="${!alerta.resolvido}" 
+                                                class="btn btn-sm btn-success" 
+                                                th:onclick="'marcarComoResolvido(' + ${alerta.id} + ')'">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" th:onclick="'excluirAlerta(' + ${alerta.id} + ')'">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div class="modal fade" id="detalhesModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalhes do Alerta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="detalhesAlerta">
+                        <!-- Detalhes serão carregados via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#tabelaAlertas').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.11.5/i18n/pt-BR.json'
+                },
+                order: [[2, 'desc']] // Ordenar por data decrescente
+            });
+        });
+
+        function visualizarDetalhes(id) {
+            // Implementar lógica para carregar detalhes do alerta
+            $('#detalhesModal').modal('show');
+        }
+
+        function marcarComoResolvido(id) {
+            if (confirm('Deseja marcar este alerta como resolvido?')) {
+                // Implementar lógica para marcar como resolvido
+                alert('Alerta ' + id + ' marcado como resolvido');
+            }
+        }
+
+        function excluirAlerta(id) {
+            if (confirm('Tem certeza que deseja excluir este alerta?')) {
+                // Implementar lógica de exclusão
+                alert('Excluindo alerta ' + id);
+            }
+        }
+
+        function salvarAlerta() {
+            const sensorId = $('#sensorId').val();
+            const tipo = $('#tipo').val();
+            const mensagem = $('#mensagem').val();
+            const nivel = $('#nivel').val();
+
+            $.ajax({
+                url: '/alertas',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    sensorId: sensorId,
+                    tipo: tipo,
+                    mensagem: mensagem,
+                    nivel: nivel
+                }),
+                success: function() {
+                    $('#novoAlertaModal').modal('hide');
+                    location.reload();
+                },
+                error: function() {
+                    alert('Erro ao salvar alerta!');
+                }
+            });
+        }
+    </script>
+</body>
+</html> 

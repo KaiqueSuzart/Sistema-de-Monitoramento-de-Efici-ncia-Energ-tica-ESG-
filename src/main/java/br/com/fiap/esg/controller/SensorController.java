@@ -11,12 +11,21 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@RestController
-@RequestMapping("/api/sensores")
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import br.com.fiap.esg.repository.SensorRepository;
+
 @Tag(name = "Sensores", description = "API para gerenciamento de sensores de energia")
+@Controller
 public class SensorController {
 
     private final SensorService sensorService;
+
+    @Autowired
+    private SensorRepository sensorRepository;
 
     public SensorController(SensorService sensorService) {
         this.sensorService = sensorService;
@@ -58,8 +67,8 @@ public class SensorController {
         return ResponseEntity.ok(sensores);
     }
 
-    @PostMapping
-    @Operation(summary = "Cadastra um novo sensor")
+    @PostMapping("/sensores")
+    @ResponseBody
     public ResponseEntity<SensorDTO> cadastrar(@RequestBody SensorDTO sensorDTO) {
         Sensor sensor = convertToEntity(sensorDTO);
         Sensor sensorSalvo = sensorService.cadastrar(sensor);
@@ -74,13 +83,6 @@ public class SensorController {
         return ResponseEntity.ok(convertToDTO(sensorAtualizado));
     }
 
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Remove um sensor")
-    public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        sensorService.excluir(id);
-        return ResponseEntity.noContent().build();
-    }
-
     @PostMapping("/{id}/manutencao")
     @Operation(summary = "Registra manutenção em um sensor")
     public ResponseEntity<SensorDTO> registrarManutencao(@PathVariable Long id) {
@@ -93,6 +95,31 @@ public class SensorController {
     public ResponseEntity<SensorDTO> finalizarManutencao(@PathVariable Long id) {
         Sensor sensor = sensorService.finalizarManutencao(id);
         return ResponseEntity.ok(convertToDTO(sensor));
+    }
+
+    @GetMapping("/sensores")
+    public String listarSensores(Model model) {
+        List<Sensor> sensores = sensorRepository.findAll();
+        model.addAttribute("sensores", sensores);
+        return "sensores";
+    }
+
+    @PostMapping("/sensores/{id}/acionar")
+    @ResponseBody
+    public void acionarSensor(@PathVariable Long id) {
+        Sensor sensor = sensorRepository.findById(id).orElseThrow();
+        if (sensor.getStatus() == Sensor.SensorStatus.ATIVO) {
+            sensor.setStatus(Sensor.SensorStatus.INATIVO);
+        } else {
+            sensor.setStatus(Sensor.SensorStatus.ATIVO);
+        }
+        sensorRepository.save(sensor);
+    }
+
+    @DeleteMapping("/sensores/{id}")
+    @ResponseBody
+    public void excluir(@PathVariable Long id) {
+        sensorRepository.deleteById(id);
     }
 
     private SensorDTO convertToDTO(Sensor sensor) {

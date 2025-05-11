@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Monitoramento - Cadastrar Consumo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-bolt me-2"></i>Sistema de Monitoramento
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/home}">
+                            <i class="fas fa-home me-1"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/logout}">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-plus-circle text-primary me-2"></i>Cadastrar Consumo
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/cadastrar-consumo}" th:object="${consumo}" method="post" class="needs-validation" novalidate>
+                            <div class="mb-3">
+                                <label class="form-label">Sensor</label>
+                                <select class="form-select" th:field="*{sensor.id}" required>
+                                    <option value="">Selecione um sensor...</option>
+                                    <option th:each="sensor : ${sensores}" 
+                                            th:value="${sensor.id}" 
+                                            th:text="${sensor.nome}">
+                                    </option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Por favor, selecione um sensor.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Consumo (kWh)</label>
+                                <div class="input-group">
+                                    <input type="number" 
+                                           class="form-control" 
+                                           th:field="*{consumoKwh}" 
+                                           step="0.01" 
+                                           required 
+                                           min="0">
+                                    <span class="input-group-text">kWh</span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Por favor, informe um valor válido para o consumo.
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Pico de Demanda</label>
+                                <div class="input-group">
+                                    <input type="number" 
+                                           class="form-control" 
+                                           th:field="*{picoDemanda}" 
+                                           step="0.01" 
+                                           min="0">
+                                    <span class="input-group-text">kW</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label">Temperatura</label>
+                                <div class="input-group">
+                                    <input type="number" 
+                                           class="form-control" 
+                                           th:field="*{temperatura}" 
+                                           step="0.01">
+                                    <span class="input-group-text">°C</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/consumos}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-1"></i>Voltar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>Salvar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validação do formulário
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+</body>
+</html> 

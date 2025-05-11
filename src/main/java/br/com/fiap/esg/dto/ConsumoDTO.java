@@ -9,6 +9,7 @@ public class ConsumoDTO {
     private Double consumoKwh;
     private Double picoDemanda;
     private Double temperatura;
+    private String sensorNome;
 
     // Getters e Setters
     public Long getId() {
@@ -57,5 +58,13 @@ public class ConsumoDTO {
 
     public void setTemperatura(Double temperatura) {
         this.temperatura = temperatura;
+    }
+
+    public String getSensorNome() {
+        return sensorNome;
+    }
+
+    public void setSensorNome(String sensorNome) {
+        this.sensorNome = sensorNome;
     }
 }
