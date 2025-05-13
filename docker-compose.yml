@@ -1,43 +1,37 @@
+version: '3.8'
+
 services:
-  oracle-db:
-    image: gvenzl/oracle-xe
-    ports:
-      - "1521:1521"
+  oracle:
+    image: gvenzl/oracle-xe:latest
+    container_name: oracle-xe
     environment:
       - ORACLE_PASSWORD=oracle
-      - ORACLE_DATABASE=XEPDB1
+      - ORACLE_DATABASE=XE
+    ports:
+      - "1521:1521"
     volumes:
       - oracle-data:/opt/oracle/oradata
-      - ./src/main/resources/db/init.sql:/container-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "healthcheck.sh"]
-      interval: 30s
-      timeout: 10s
+      test: ["CMD", "sqlplus", "-L", "system/oracle@//localhost:1521/XE", "AS", "SYSDBA"]
+      interval: 10s
+      timeout: 5s
       retries: 5
-      start_period: 60s
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
+    container_name: esg-energy-app
+    depends_on:
+      oracle:
+        condition: service_healthy
     ports:
-      - "8080:8080"
-    restart: unless-stopped
+      - "8082:8082"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//oracle-db:1521/XEPDB1
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@oracle:1521:XE
       - SPRING_DATASOURCE_USERNAME=system
       - SPRING_DATASOURCE_PASSWORD=oracle
-      - SPRING_PROFILES_ACTIVE=prod
-      - JAVA_TOOL_OPTIONS=-Xmx512m -Xms256m
-    depends_on:
-      oracle-db:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL","curl -f http://localhost:8080/actuator/health || exit 1"]
-      interval: 30s
-      timeout: 10s
-      start_period: 60s
-      retries: 5
+    volumes:
+      - ./src:/app/src
+      - ./target:/app/target
 
 volumes:
   oracle-data:

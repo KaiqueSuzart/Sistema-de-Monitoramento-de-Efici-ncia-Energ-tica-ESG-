@@ -1,15 +1,27 @@
 package br.com.fiap.esg.dto;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
+@Data
 public class ConsumoDTO {
     private Long id;
+    @NotNull(message = "O ID do sensor é obrigatório")
     private Long sensorId;
+    @NotNull(message = "A data da medição é obrigatória")
+    @PastOrPresent(message = "A data da medição não pode ser futura")
     private LocalDateTime dataMedicao;
+    @NotNull(message = "O consumo em kWh é obrigatório")
+    @DecimalMin(value = "0.0", message = "O consumo deve ser maior ou igual a zero")
     private Double consumoKwh;
     private Double picoDemanda;
     private Double temperatura;
     private String sensorNome;
+    private String observacao;
 
     // Getters e Setters
     public Long getId() {

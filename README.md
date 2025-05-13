@@ -1,88 +1,162 @@
 # Sistema de Monitoramento de Eficiência Energética ESG
 
-## Descrição do Projeto
+Sistema desenvolvido para monitoramento de eficiência energética com foco em práticas ESG (Environmental, Social, and Governance).
 
-Este projeto é um sistema de monitoramento de eficiência energética, alinhado aos temas de ESG (Environmental, Social, and Governance). O objetivo é permitir o acompanhamento de sensores, consumos e alertas, promovendo a gestão eficiente de recursos e a governança de dados energéticos.
+## Requisitos
 
-O sistema foi desenvolvido em Java com Spring Boot, utilizando práticas modernas de desenvolvimento, segurança, integração com banco de dados e interface web responsiva.
+- Java 17
+- Maven 3.8+
+- Docker e Docker Compose
+- Oracle Database XE (opcional, pode usar Docker)
 
-> **Observação:** Apesar do enunciado exigir Oracle, devido a problemas técnicos de conexão, o sistema foi implementado e testado com o banco H2 em memória. O código está pronto para ser adaptado ao Oracle, bastando ajustar o arquivo `application.properties` e as dependências.
+## Configuração do Ambiente
 
----
+### Usando Docker (Recomendado)
 
-## Funcionalidades RESTful Implementadas
+1. Clone o repositório:
+```bash
+git clone [URL_DO_REPOSITÓRIO]
+cd [NOME_DO_DIRETÓRIO]
+```
 
-O sistema expõe diversos endpoints RESTful, incluindo (mas não se limitando a):
+2. Execute o ambiente com Docker Compose:
+```bash
+docker-compose up -d
+```
 
-- **Sensores**
-  - `GET /sensores` — Listar sensores cadastrados
-  - `POST /sensores` — Cadastrar novo sensor
-  - `PUT /sensores/{id}` — Atualizar sensor existente
-  - `DELETE /sensores/{id}` — Remover sensor
-  - `POST /sensores/{id}/acionar` — Acionar/desligar sensor (altera status)
+A aplicação estará disponível em: http://localhost:8082
 
-- **Consumos**
-  - `GET /consumos` — Listar consumos registrados
-  - `POST /cadastrar-consumo` — Cadastrar novo consumo
-  - `PUT /consumos/{id}` — Editar consumo
-  - `DELETE /consumos/{id}` — Remover consumo
+### Configuração Manual
 
-- **Alertas**
-  - `GET /alertas` — Listar alertas
-  - `POST /alertas` — Cadastrar novo alerta
-  - `DELETE /alertas/{id}` — Remover alerta
+1. Instale o Oracle Database XE
+2. Configure as credenciais no `application.properties`
+3. Execute o projeto:
+```bash
+mvn spring-boot:run
+```
 
-- **Relatórios**
-  - `GET /relatorio` — Visualizar relatório de consumos e indicadores
+## Acesso ao Sistema
 
----
+### Usuários Padrão
 
-## Tecnologias e Práticas Utilizadas
+- **Administrador**
+  - Usuário: admin
+  - Senha: admin123
 
-- **Java 17**
-- **Spring Boot 3**
-- **Spring Data JPA**
-- **Spring Security** (autenticação e proteção de endpoints)
-- **Thymeleaf** (templates web)
-- **Bootstrap 5** (interface moderna e responsiva)
-- **DataTables** (tabelas dinâmicas)
-- **Banco de Dados H2** (em memória, pronto para Oracle)
-- **Migrations**: Estrutura preparada para uso de Flyway/Liquibase
-- **Docker**: Projeto pronto para conteinerização (Dockerfile e docker-compose)
-- **Validações e tratamento de exceções**
-- **Documentação dos endpoints via Swagger/OpenAPI**
+- **Usuário Comum**
+  - Usuário: user
+  - Senha: user123
 
----
+## Funcionalidades
 
-## Como Executar
+- Monitoramento de consumo energético
+- Alertas de consumo excessivo
+- Relatórios de eficiência
+- Dashboard com gráficos
+- Exportação de dados
 
-1. Clone o repositório
-2. Execute `mvn spring-boot:run`
-3. Acesse [http://localhost:8082](http://localhost:8082) no navegador
-4. Console do banco H2: [http://localhost:8082/h2-console](http://localhost:8082/h2-console)
-   - JDBC URL: `jdbc:h2:mem:devdb`
-   - Usuário: `sa` (sem senha)
+## Endpoints da API
 
----
+- GET /api/consumos - Lista todos os consumos
+- POST /api/consumos - Registra novo consumo
+- GET /api/alertas - Lista todos os alertas
+- GET /api/relatorios - Gera relatórios
 
-## Observações Importantes
+## Documentação da API
 
-- O sistema está pronto para ser adaptado para Oracle, bastando ajustar o arquivo de configuração.
-- O uso do H2 foi necessário para garantir a entrega funcional, devido a limitações técnicas no ambiente de desenvolvimento.
-- O projeto inclui exemplos de migração de banco e está preparado para uso em Docker.
-- Todos os endpoints principais exigidos pelo enunciado estão implementados, com autenticação e validação.
+A documentação Swagger está disponível em:
+http://localhost:8082/swagger-ui.html
 
----
+### Exemplos de Uso da API
 
-## Segurança e Boas Práticas
+#### Registrar Consumo
+```http
+POST /api/consumos
+Content-Type: application/json
 
-- Endpoints protegidos com Spring Security.
-- Validação de dados no backend.
-- Tratamento de exceções e mensagens amigáveis.
-- Interface web moderna e responsiva.
+{
+    "sensorId": 1,
+    "consumoKwh": 150.0,
+    "dataMedicao": "2024-03-20T10:00:00",
+    "observacao": "Consumo normal"
+}
+```
 
----
+#### Buscar Consumos por Período
+```http
+GET /api/consumos/total/1?inicio=2024-03-01T00:00:00&fim=2024-03-20T23:59:59
+```
 
-## Contato e Suporte
+## Testes
 
-Em caso de dúvidas ou problemas, abra uma issue no repositório ou entre em contato com o time de desenvolvimento.
+O projeto inclui testes unitários e de integração. Para executar os testes:
+
+```bash
+mvn test
+```
+
+### Cobertura de Testes
+
+- Testes unitários para serviços
+- Testes de integração para controllers
+- Mocks para isolamento de dependências
+
+## Validações
+
+O sistema implementa validações em diferentes níveis:
+
+### Validações de Dados
+- Campos obrigatórios
+- Formato de datas
+- Valores numéricos positivos
+- Validações de negócio
+
+### Tratamento de Erros
+- Mensagens de erro personalizadas
+- Logs detalhados
+- Respostas HTTP apropriadas
+
+## Desenvolvimento
+
+### Estrutura do Projeto
+
+```
+src/
+├── main/
+│   ├── java/
+│   │   └── br/com/fiap/esg/
+│   │       ├── config/
+│   │       ├── controller/
+│   │       ├── model/
+│   │       ├── repository/
+│   │       ├── service/
+│   │       └── exception/
+│   └── resources/
+│       ├── static/
+│       ├── templates/
+│       └── db/migration/
+└── test/
+    └── java/
+        └── br/com/fiap/esg/
+            ├── controller/
+            ├── service/
+            └── repository/
+```
+
+### Executando Testes
+
+```bash
+mvn test
+```
+
+## Contribuição
+
+1. Faça o fork do projeto
+2. Crie uma branch para sua feature
+3. Commit suas mudanças
+4. Push para a branch
+5. Abra um Pull Request
+
+## Licença
+
+Este projeto está sob a licença MIT.

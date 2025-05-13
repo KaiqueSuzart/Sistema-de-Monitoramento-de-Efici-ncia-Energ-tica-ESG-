@@ -1,5 +1,5 @@
 # Stage 1: Build with Maven, leveraging layer cache for dependencies
-FROM maven:3.9.4-eclipse-temurin-17 AS builder
+FROM maven:3.8.4-openjdk-17-slim AS build
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests -B
 
 # Stage 2: Runtime on a lean JRE with hardened non-root user
-FROM eclipse-temurin:17-jre
+FROM openjdk:17-slim
 
 LABEL maintainer="seu-email@exemplo.com"
 
@@ -23,11 +23,11 @@ RUN addgroup --system appgroup \
 WORKDIR /app
 
 # 2) Copy the fat JAR and set ownership
-COPY --from=builder /app/target/*.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 RUN chown appuser:appgroup app.jar
 
 # 3) Expose application port
-EXPOSE 8080
+EXPOSE 8082
 
 # 4) Switch to non-root user
 USER appuser
@@ -40,7 +40,7 @@ ENV JAVA_TOOL_OPTIONS="-XX:+UseG1GC \
 
 # 6) Configure healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
+  CMD curl -f http://localhost:8082/actuator/health || exit 1
 
 # 7) Launch the application
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
